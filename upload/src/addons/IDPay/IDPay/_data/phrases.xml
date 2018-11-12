@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<phrases>
+  <phrase title="idpay_api_key_id" version_id="1" version_string="1.0.0"><![CDATA[IDPay API KEY]]></phrase>
+  <phrase title="idpay_confirm_payment_details" version_id="1" version_string="1.0.0"><![CDATA[تایید پرداخت IDPay]]></phrase>
+  <phrase title="idpay_default_failed_message" version_id="1" version_string="1.0.0"><![CDATA[پرداخت شما ناموفق بوده است. لطفا مجددا تلاش نمایید یا در صورت بروز اشکال با مدیر سایت تماس بگیرید.]]></phrase>
+  <phrase title="idpay_default_success_message" version_id="1" version_string="1.0.0"><![CDATA[پرداخت شما با موفقیت انجام شد. کد رهگیری: {track_id}]]></phrase>
+  <phrase title="idpay_failed_message_text" version_id="1" version_string="1.0.0"><![CDATA[پیام پرداخت ناموفق]]></phrase>
+  <phrase title="idpay_payment_comment" version_id="1" version_string="1.0.0"><![CDATA[متن پیامی که می خواهید بعد از پرداخت به کاربر نمایش دهید را وارد کنید. همچنین می توانید از شورت کدهای {order_id} برای نمایش شماره سفارش و {track_id} برای نمایش کد رهگیری آیدی پی استفاده نمایید.]]></phrase>
+  <phrase title="idpay_sandbox_text" version_id="1" version_string="1.0.0"><![CDATA[آزمایشگاه]]></phrase>
+  <phrase title="idpay_success_message_text" version_id="1" version_string="1.0.0"><![CDATA[پیام پرداخت موفق]]></phrase>
+  <phrase title="you_must_provide_idpay_api_key" version_id="1" version_string="1.0.0"><![CDATA[You must provide a IDPay API KEY to set up this payment gateway]]></phrase>
+</phrases>

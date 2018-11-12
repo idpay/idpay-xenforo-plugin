@@ -1,0 +1,14 @@
+{
+    "legacy_addon_id": "IDPay/IDPay",
+    "title": "IDPay",
+    "description": "IDPay Payment Gateway",
+    "version_id": 1,
+    "version_string": "1.0.0",
+    "dev": "JMDMahdi, Publisher: IDPay",
+    "dev_url": "https://idpay.ir/",
+    "faq_url": "",
+    "support_url": "",
+    "extra_urls": [],
+    "require": [],
+    "icon": "icon.png"
+}
