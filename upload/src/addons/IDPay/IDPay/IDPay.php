@@ -53,7 +53,7 @@ class IDPay extends AbstractProvider
             'callback' => $callback,
         );
 
-        $ch = curl_init('https://api.idpay.ir/v1/payment');
+        $ch = curl_init('https://api.idpay.ir/v1.1/payment');
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
@@ -67,8 +67,14 @@ class IDPay extends AbstractProvider
         $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        if ($http_status != 201 || empty($result) || empty($result->id) || empty($result->link)) {
-            return sprintf('خطا هنگام ایجاد تراکنش. کد خطا: %s', $http_status);
+        if ($http_status != 201) {
+            if ( !empty($result->error_message) && !empty($result->error_code)) {
+              $message = sprintf('خطا هنگام ایجاد تراکنش. وضعیت خطا: %s - کد خطا: %s - پیام خطا: %s', $http_status, $result->error_code, $result->error_message);
+              return $controller->error($message);
+            }
+            $message = sprintf('خطا هنگام ایجاد تراکنش. وضعیت خطا: %s', $http_status);
+            return $controller->error($message);
+
         } else {
             @session_start();
             $_SESSION[$result->id . '1'] = $purchase->returnUrl;
@@ -92,6 +98,7 @@ class IDPay extends AbstractProvider
         $state->taxAmount = 0;
         $state->costCurrency = 'IRR';
         $state->paymentStatus = $request->filter('status', 'unum');
+        $state->trackId = $request->filter('track_id', 'unum');
         $state->requestKey = $request->filter('order_id', 'str');
         $state->ip = $request->getIp();
         $state->_POST = $_REQUEST;
@@ -141,11 +148,7 @@ class IDPay extends AbstractProvider
 
     public function getPaymentResult(CallbackState $state)
     {
-        if (intval($state->paymentStatus) == 100) {
-            $state->paymentResult = CallbackState::PAYMENT_RECEIVED;
-        } else {
-            $state->paymentResult = CallbackState::PAYMENT_REINSTATED;
-        }
+		    // Just Do It.
     }
 
     public function prepareLogData(CallbackState $state)
@@ -153,66 +156,95 @@ class IDPay extends AbstractProvider
         $state->logDetails = $state->_POST;
     }
 
-    public function completeTransaction(CallbackState $state)
-    {
-        @session_start();
-        $router = \XF::app()->router('public');
-        $returnUrl = $_SESSION[$state->transactionId . '1'];
-        $cancelUrl = $_SESSION[$state->transactionId . '2'];
-        if (!$returnUrl) $returnUrl = $_COOKIE[$state->transactionId . '1'];
-        if (!$cancelUrl) $cancelUrl = $_COOKIE[$state->transactionId . '2'];
-        if (!$returnUrl) $returnUrl = $router->buildLink('canonical:account/upgrade-purchase');
-        if (!$cancelUrl) $cancelUrl = $router->buildLink('canonical:account/upgrades');
-        unset($_SESSION[$state->transactionId . '1'], $_SESSION[$state->transactionId . '2']);
-        setcookie($state->transactionId . '1', './?', time(), '/');
-        setcookie($state->transactionId . '2', './?', time(), '/');
+    public function completeTransaction(CallbackState $state) {
+	    @session_start();
+	    $router    = \XF::app()->router( 'public' );
+	    $returnUrl = $_SESSION[$state->transactionId . '1'];
+	    $cancelUrl = $_SESSION[$state->transactionId . '2'];
+	    if ( ! $returnUrl )
+	    {
+		    $returnUrl = $_COOKIE[$state->transactionId . '1'];
+	    }
+	    if ( ! $cancelUrl )
+	    {
+		    $cancelUrl = $_COOKIE[$state->transactionId . '2'];
+	    }
+	    if ( ! $returnUrl )
+	    {
+		    $returnUrl = $router->buildLink( 'canonical:account/upgrade-purchase' );
+	    }
+	    if ( ! $cancelUrl )
+	    {
+		    $cancelUrl = $router->buildLink( 'canonical:account/upgrades' );
+	    }
+	    unset( $_SESSION[$state->transactionId . '1'], $_SESSION[$state->transactionId . '2'] );
+	    setcookie( $state->transactionId . '1', './?', time(), '/' );
+	    setcookie( $state->transactionId . '2', './?', time(), '/' );
 
-        $api_key = $state->paymentProfile->options['idpay_api_key'];
-        $sandbox = $state->paymentProfile->options['idpay_sandbox'] == 1 ? 'true' : 'false';
-        $url = $cancelUrl;
-        $data = array(
-            'id' => $state->transactionId,
-            'order_id' => $state->requestKey
-        );
+	    if ($state->paymentStatus == 10)
+	    {
+		    $api_key = $state->paymentProfile->options['idpay_api_key'];
+		    $sandbox = $state->paymentProfile->options['idpay_sandbox'] == 1 ? 'true' : 'false';
+		    $url     = $cancelUrl;
+		    $data    = array(
+			    'id'       => $state->transactionId,
+			    'order_id' => $state->requestKey
+		    );
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://api.idpay.ir/v1/payment/inquiry');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Content-Type: application/json',
-            'X-API-KEY:' . $api_key,
-            'X-SANDBOX:' . $sandbox,
-        ));
+		    $ch = curl_init();
+		    curl_setopt( $ch, CURLOPT_URL, 'https://api.idpay.ir/v1.1/payment/verify' );
+		    curl_setopt( $ch, CURLOPT_POSTFIELDS, json_encode( $data ) );
+		    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, TRUE );
+		    curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
+			    'Content-Type: application/json',
+			    'X-API-KEY:' . $api_key,
+			    'X-SANDBOX:' . $sandbox,
+		    ) );
 
-        $result = curl_exec($ch);
-        $result = json_decode($result);
-        $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+		    $result      = curl_exec( $ch );
+		    $result      = json_decode( $result );
+		    $http_status = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+		    curl_close( $ch );
 
-        if ($http_status != 200) {
-            $state->logType = 'error';
-            $state->logMessage = sprintf('خطا هنگام بررسی وضعیت تراکنش. کد خطا: %s', $http_status);
-        }
 
-        $inquiry_status = empty($result->status) ? NULL : $result->status;
-        $inquiry_track_id = empty($result->track_id) ? NULL : $result->track_id;
-        $inquiry_order_id = empty($result->order_id) ? NULL : $result->order_id;
-        $inquiry_amount = empty($result->amount) ? NULL : $result->amount;
+		    if ( $http_status != 200 )
+		    {
+			    $state->logType    = 'error';
+			    $state->logMessage = sprintf( 'خطا هنگام بررسی وضعیت تراکنش. وضعیت خطا: %s - کدخطا: %s - پیام خطا: %s', $http_status, $result->error_code, $result->error_message );
+		    }
+		    else
+		    {
+			    $verify_status   = empty( $result->status ) ? NULL : $result->status;
+			    $verify_track_id = empty( $result->track_id ) ? NULL : $result->track_id;
+			    $verify_order_id = empty( $result->order_id ) ? NULL : $result->order_id;
+			    $verify_amount   = empty( $result->amount ) ? NULL : $result->amount;
 
-        if (empty($inquiry_status) || empty($inquiry_track_id) || empty($inquiry_amount) || $inquiry_amount != $amount || $inquiry_status != 100) {
-            $state->logType = 'error';
-            $state->logMessage = $this->idpay_get_failed_message($state->paymentProfile->options['idpay_failed_message'], $inquiry_track_id, $inquiry_order_id);
-
-        } else {
-            $state->transactionId = $inquiry_track_id;
-            parent::completeTransaction($state);
-            $url = $returnUrl;
-        }
+			    if ( empty( $verify_status ) || empty( $verify_track_id ) || empty( $verify_amount ) || $verify_status < 100 )
+			    {
+				    $state->paymentResult = CallbackState::PAYMENT_REINSTATED;
+				    $state->logType    = 'error';
+				    $state->logMessage = $this->idpay_get_failed_message( $state->paymentProfile->options['idpay_failed_message'], $verify_track_id, $verify_order_id );
+				    $url = $cancelUrl;
+			    }
+			    else
+			    {
+				    $state->paymentResult = CallbackState::PAYMENT_RECEIVED;
+				    $state->transactionId = $verify_track_id;
+				    parent::completeTransaction( $state );
+				    $url = $returnUrl;
+			    }
+		    }
+	    }
+	    else {
+		    $state->paymentResult = CallbackState::PAYMENT_REINSTATED;
+		    $state->logType    = 'error';
+		    $state->logMessage = $this->idpay_get_failed_message( $state->paymentProfile->options['idpay_failed_message'], $state->trackId, $state->requestKey );
+		    $url = $cancelUrl;
+	    }
         @header('location: ' . $url);
         echo '<script>document.location="' . $url . '";</script>';
-        exit;
     }
+
 
     public function idpay_get_failed_message($failed_massage, $track_id, $order_id)
     {
