@@ -13,6 +13,7 @@ namespace IDPay\IDPay;
 
 use XF\Entity\PaymentProfile;
 use XF\Entity\PurchaseRequest;
+use XF\Http\Request;
 use XF\Mvc\Controller;
 use XF\Payment\AbstractProvider;
 use XF\Payment\CallbackState;
@@ -36,7 +37,9 @@ class IDPay extends AbstractProvider
     public function initiatePayment(Controller $controller, PurchaseRequest $purchaseRequest, Purchase $purchase)
     {
         $api_key = $purchase->paymentProfile->options['idpay_api_key'];
-        $sandbox = $purchase->paymentProfile->options['idpay_sandbox'] == 1 ? 'true' : 'false';
+        $sandbox = !empty($purchase->paymentProfile->options['idpay_sandbox'])
+            && $purchase->paymentProfile->options['idpay_sandbox'] == 1
+            ? 'true' : 'false';
         $amount = intval($purchase->cost);
         $desc = ($purchase->title ?: ('Invoice#' . $purchaseRequest->request_key));
         $callback = $this->getCallbackUrl();
@@ -48,7 +51,9 @@ class IDPay extends AbstractProvider
         $data = array(
             'order_id' => $purchaseRequest->request_key,
             'amount' => $amount,
+            'name' => $purchase->purchaser->username,
             'phone' => '',
+            'mail' => $purchase->purchaser->email,
             'desc' => $desc,
             'callback' => $callback,
         );
@@ -95,6 +100,9 @@ class IDPay extends AbstractProvider
         $state = new CallbackState();
         $state->transactionId = $request->filter('id', 'str');
         $state->costAmount = $request->filter('amount', 'unum');
+        if (empty($state->costAmount)) {
+            $state->noAmount = true;
+        }
         $state->taxAmount = 0;
         $state->costCurrency = 'IRR';
         $state->paymentStatus = $request->filter('status', 'unum');
@@ -137,10 +145,13 @@ class IDPay extends AbstractProvider
         $purchaseRequest = $state->getPurchaseRequest();
         $cost = $purchaseRequest->cost_amount;
         $currency = $purchaseRequest->cost_currency;
+        if(!empty($state->noAmount) && empty($state->costAmount)) {
+            return true;
+        }
         $costValidated = (round(($state->costAmount - $state->taxAmount), 2) == round($cost, 2) && $state->costCurrency == $currency);
         if (!$costValidated) {
             $state->logType = 'error';
-            $state->logMessage = 'Invalid cost amount';
+            $state->logMessage = 'Invalid cost amount. please check amount and currency to be correct.';
             return false;
         }
         return true;
@@ -159,21 +170,21 @@ class IDPay extends AbstractProvider
     public function completeTransaction(CallbackState $state) {
 	    @session_start();
 	    $router    = \XF::app()->router( 'public' );
-	    $returnUrl = $_SESSION[$state->transactionId . '1'];
-	    $cancelUrl = $_SESSION[$state->transactionId . '2'];
-	    if ( ! $returnUrl )
+	    $returnUrl = !empty($_SESSION[$state->transactionId . '1']) ? $_SESSION[$state->transactionId . '1'] : '';
+	    $cancelUrl = !empty($_SESSION[$state->transactionId . '2']) ? $_SESSION[$state->transactionId . '2'] : '';
+	    if ( empty( $returnUrl ) )
 	    {
 		    $returnUrl = $_COOKIE[$state->transactionId . '1'];
 	    }
-	    if ( ! $cancelUrl )
+	    if ( empty( $cancelUrl ) )
 	    {
 		    $cancelUrl = $_COOKIE[$state->transactionId . '2'];
 	    }
-	    if ( ! $returnUrl )
+	    if ( empty( $returnUrl ) )
 	    {
 		    $returnUrl = $router->buildLink( 'canonical:account/upgrade-purchase' );
 	    }
-	    if ( ! $cancelUrl )
+	    if ( empty( $cancelUrl ) )
 	    {
 		    $cancelUrl = $router->buildLink( 'canonical:account/upgrades' );
 	    }
@@ -219,6 +230,8 @@ class IDPay extends AbstractProvider
 			    $verify_order_id = empty( $result->order_id ) ? NULL : $result->order_id;
 			    $verify_amount   = empty( $result->amount ) ? NULL : $result->amount;
 
+                $state->transactionId = $verify_track_id;
+
 			    if ( empty( $verify_status ) || empty( $verify_track_id ) || empty( $verify_amount ) || $verify_status < 100 )
 			    {
 				    $state->paymentResult = CallbackState::PAYMENT_REINSTATED;
@@ -229,7 +242,8 @@ class IDPay extends AbstractProvider
 			    else
 			    {
 				    $state->paymentResult = CallbackState::PAYMENT_RECEIVED;
-				    $state->transactionId = $verify_track_id;
+                    $state->logType    = 'success';
+                    $state->logMessage = $this->idpay_get_success_message( $state->paymentProfile->options['idpay_success_message'], $verify_track_id, $verify_order_id );
 				    parent::completeTransaction( $state );
 				    $url = $returnUrl;
 			    }
@@ -237,12 +251,14 @@ class IDPay extends AbstractProvider
 	    }
 	    else {
 		    $state->paymentResult = CallbackState::PAYMENT_REINSTATED;
+            $state->transactionId = $state->trackId;
 		    $state->logType    = 'error';
 		    $state->logMessage = $this->idpay_get_failed_message( $state->paymentProfile->options['idpay_failed_message'], $state->trackId, $state->requestKey );
 		    $url = $cancelUrl;
 	    }
+
         @header('location: ' . $url);
-        echo '<script>document.location="' . $url . '";</script>';
+        exit;
     }
 
 
