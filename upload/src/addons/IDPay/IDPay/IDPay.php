@@ -13,7 +13,6 @@ namespace IDPay\IDPay;
 
 use XF\Entity\PaymentProfile;
 use XF\Entity\PurchaseRequest;
-use XF\Http\Request;
 use XF\Mvc\Controller;
 use XF\Payment\AbstractProvider;
 use XF\Payment\CallbackState;
