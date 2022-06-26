@@ -255,9 +255,12 @@ class IDPay extends AbstractProvider
             $state->logMessage = $this->idpay_get_failed_message( $state->paymentProfile->options['idpay_failed_message'], $state->trackId, $state->requestKey );
             $url = $cancelUrl;
         }
-
-        @header('location: ' . $url);
+        @header('location: '.$url);
+        echo '<script>document.location="'.$url.'";</script>';
         exit;
+      //  @header('location: ' . $url);
+//        exit;
+        // return $state ;
     }
 
 
