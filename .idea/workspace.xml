@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="0f25b01e-9a5c-4533-83d9-f9b34fb8223b" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/IDPay.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/Setup.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/admin_navigation.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/admin_permission.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/advertising_positions.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/bb_code_media_sites.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/bb_codes.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/class_extensions.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/code_event_listeners.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/code_events.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/content_type_fields.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/cron.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/help_pages.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/member_stats.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/navigation.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/option_groups.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/options.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/permission_interface_groups.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/permissions.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/phrases.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/routes.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/style_properties.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/style_property_groups.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/template_modifications.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/templates.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/widget_definitions.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/_data/widget_positions.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/addon.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/hashes.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/upload/src/addons/IDPay/IDPay/icon.png" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2B6o7NdmA6KB2bnOZg7dvviPERp" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0f25b01e-9a5c-4533-83d9-f9b34fb8223b" name="Changes" comment="" />
+      <created>1656235727573</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1656235727573</updated>
+      <workItem from="1656235728701" duration="91000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
