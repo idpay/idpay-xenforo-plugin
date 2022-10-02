@@ -20,9 +20,16 @@ use XF\Purchasable\Purchase;
 
 class IDPay extends AbstractProvider
 {
+    public string $URL ='';
     public function getTitle()
     {
         return 'IDPay';
+    }
+    public function  __construct($providerId)
+    {
+        parent::__construct($providerId);
+        $router    = \XF::app()->router( 'public' );
+       $this->URL = $router->buildLink( 'canonical:account/upgrades' );
     }
 
     public function verifyConfig(array &$options, &$errors = [])
@@ -164,6 +171,7 @@ class IDPay extends AbstractProvider
     public function prepareLogData(CallbackState $state)
     {
         $state->logDetails = $state->_POST;
+        $this->redirect();
     }
 
     public function completeTransaction(CallbackState $state) {
@@ -237,6 +245,7 @@ class IDPay extends AbstractProvider
                     $state->logType    = 'error';
                     $state->logMessage = $this->idpay_get_failed_message( $state->paymentProfile->options['idpay_failed_message'], $verify_track_id, $verify_order_id );
                     $url = $cancelUrl;
+                    $this->URL = $url;
                 }
                 else
                 {
@@ -254,10 +263,10 @@ class IDPay extends AbstractProvider
             $state->logType    = 'error';
             $state->logMessage = $this->idpay_get_failed_message( $state->paymentProfile->options['idpay_failed_message'], $state->trackId, $state->requestKey );
             $url = $cancelUrl;
-        }
+            $this->URL = $url;
 
-        @header('location: ' . $url);
-        exit;
+        }
+         return $state ;
     }
 
 
@@ -269,6 +278,12 @@ class IDPay extends AbstractProvider
     public function idpay_get_success_message($success_massage, $track_id, $order_id)
     {
         return str_replace(["{track_id}", "{order_id}"], [$track_id, $order_id], $success_massage);
+    }
+
+    public  function redirect()
+    {
+        @header('location: '.$this->URL);
+        echo '<script>document.location="'.$this->URL.'";</script>';
     }
 
 }
